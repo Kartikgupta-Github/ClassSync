@@ -57,8 +57,13 @@ function reducer(state: AppState, action: Action): AppState {
             return {
                 ...state,
                 ...action.data,
+                // Preserve local-only fields that should never be overwritten by server
                 loggedInUserId: state.loggedInUserId,
+                joinedGroups: state.joinedGroups,
                 currentUser: currentUser,
+                onboarded: state.onboarded,
+                mode: state.mode,
+                group: state.group,
             };
         }
 
@@ -291,8 +296,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }, [state.group, state.mode]);
 
     // 4. Firestore Push (Group Data)
+    // Only push if:
+    //   - We are in a group
+    //   - This was a local change (not a SYNC_GROUP echo)
+    //   - We have already synced at least once (so we have the full server data)
     useEffect(() => {
-        if (state.mode === 'group' && state.group && isLocalChange.current) {
+        if (state.mode === 'group' && state.group && isLocalChange.current && isSynced.current) {
             const { tasks, members, accounts, rolePermissions } = state;
             updateGroupState(state.group, { tasks, members, accounts, rolePermissions });
         }
@@ -325,6 +334,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const wrappedDispatch = (action: Action) => {
         if (['JOIN_GROUP', 'LEAVE_GROUP', 'FIREBASE_LOGIN', 'LOAD_STATE'].includes(action.type)) {
             isLocalChange.current = false;
+            isSynced.current = false; // Force re-sync from server before pushing
         } else if (action.type !== 'SYNC_GROUP') {
             isLocalChange.current = true;
         }
