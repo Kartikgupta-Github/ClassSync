@@ -1,9 +1,9 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 
-const Navbar: React.FC<{ onOpenModal: () => void; onOpenAdmin: () => void; onLogout: () => void }> = ({ onOpenModal, onOpenAdmin, onLogout }) => {
-    const { state, currentAccount, hasPermission } = useApp();
-    const inGroup = state.group && state.user;
+const Navbar: React.FC<{ onOpenModal: () => void; onOpenAdmin: () => void; onLogout: () => void; onLeaveGroup: () => void }> = ({ onOpenModal, onOpenAdmin, onLogout, onLeaveGroup }) => {
+    const { state, currentAccount } = useApp();
+    const inGroup = state.group || state.mode === 'solo';
 
     return (
         <nav>
@@ -11,8 +11,30 @@ const Navbar: React.FC<{ onOpenModal: () => void; onOpenAdmin: () => void; onLog
                 <div className="logo-dot"></div>
                 ClassSync
             </div>
-            <div className="nav-right">
-                {inGroup && <span className="badge">{state.group}</span>}
+
+            {inGroup && (
+                <div style={{
+                    position: 'absolute',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    fontWeight: 700,
+                    fontSize: '1.2rem',
+                    color: 'var(--text)',
+                    letterSpacing: '0.5px'
+                }}>
+                    {state.mode === 'solo' ? 'Solo Workspace' : state.groupName || 'Loading...'}
+                </div>
+            )}
+
+            <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {inGroup && (
+                    <>
+                        <button className="btn btn-ghost btn-sm" onClick={onLeaveGroup} title="Leave Class" style={{ marginRight: '8px' }}>
+                            ← Back
+                        </button>
+                        {state.group && <span className="badge">{state.group}</span>}
+                    </>
+                )}
                 {state.mode === 'solo' && <span className="badge" style={{ background: 'var(--accent3)', color: '#000' }}>SOLO</span>}
 
                 {currentAccount && (

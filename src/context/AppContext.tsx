@@ -4,16 +4,17 @@ import { getColor, DEFAULT_PERMISSIONS } from '../types';
 import { syncGroupData, updateGroupState, saveUserGroup } from '../lib/firebase';
 
 type Action =
+    // App Lifecycle
     | { type: 'LOAD_STATE'; state: AppState }
     | { type: 'SYNC_GROUP'; data: Partial<AppState> }
-    // Auth
     | { type: 'REGISTER'; account: UserAccount }
     | { type: 'LOGIN'; userId: string }
-    | { type: 'FIREBASE_LOGIN'; userId: string; email: string; displayName: string; lastGroupCode?: string; mode?: 'group' | 'solo' }
+    | { type: 'FIREBASE_LOGIN'; userId: string; email: string; displayName: string; lastGroupCode?: string | null; mode?: 'group' | 'solo' | null; joinedGroups?: string[] }
     | { type: 'LOGOUT' }
     // Group / Solo
-    | { type: 'JOIN_GROUP'; name: string; code: string; userId: string; isCreator?: boolean }
+    | { type: 'JOIN_GROUP'; name: string; code: string; userId: string; isCreator?: boolean; groupName?: string }
     | { type: 'SET_SOLO'; name: string; userId: string }
+    | { type: 'LEAVE_GROUP' }
     // Tasks
     | { type: 'ADD_TASK'; task: Task }
     | { type: 'DELETE_TASK'; taskId: number }
@@ -40,6 +41,7 @@ const initialState: AppState = {
     accounts: [],
     loggedInUserId: null,
     rolePermissions: { ...DEFAULT_PERMISSIONS },
+    joinedGroups: [],
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -73,6 +75,7 @@ function reducer(state: AppState, action: Action): AppState {
                 loggedInUserId: action.userId,
                 group: action.lastGroupCode || state.group,
                 mode: action.mode || state.mode,
+                joinedGroups: action.joinedGroups || state.joinedGroups,
                 onboarded: !!action.lastGroupCode || state.mode === 'solo' || state.onboarded,
             };
 
@@ -110,9 +113,12 @@ function reducer(state: AppState, action: Action): AppState {
             const accounts = state.accounts.map(a =>
                 a.id === action.userId ? { ...a, memberIdx: idx, role: role as Role } : a
             );
+            const newCode = action.code.toUpperCase();
             return {
-                ...state, group: action.code.toUpperCase(), members, user: action.name,
+                ...state, group: newCode, members, user: action.name,
+                groupName: action.groupName || state.groupName,
                 currentUser: idx, mode: 'group', onboarded: true, accounts,
+                joinedGroups: state.joinedGroups.includes(newCode) ? state.joinedGroups : [...state.joinedGroups, newCode]
             };
         }
 
@@ -124,6 +130,18 @@ function reducer(state: AppState, action: Action): AppState {
                 ...state, user: action.name,
                 members: [{ name: action.name, color: getColor(0) }],
                 currentUser: 0, mode: 'solo', group: null, onboarded: true, accounts,
+            };
+        }
+
+        case 'LEAVE_GROUP': {
+            return {
+                ...state,
+                group: null,
+                mode: null,
+                currentUser: null,
+                tasks: [],
+                members: [],
+                onboarded: true, // They are onboarded, just currently viewing the dashboard menu
             };
         }
 
@@ -305,7 +323,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     // Wrap dispatch to track local changes
     const wrappedDispatch = (action: Action) => {
-        if (!['SYNC_GROUP', 'LOAD_STATE', 'JOIN_GROUP', 'FIREBASE_LOGIN'].includes(action.type)) {
+        if (['JOIN_GROUP', 'LEAVE_GROUP', 'FIREBASE_LOGIN', 'LOAD_STATE'].includes(action.type)) {
+            isLocalChange.current = false;
+        } else if (action.type !== 'SYNC_GROUP') {
             isLocalChange.current = true;
         }
         dispatch(action);

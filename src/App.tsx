@@ -6,7 +6,8 @@ import OnboardingModal from './components/OnboardingModal';
 import Dashboard from './components/Dashboard';
 import AdminPanel from './components/AdminPanel';
 import ToastContainer, { showToast } from './components/Toast';
-import { logOut } from './lib/firebase';
+import { logOut, saveUserGroup } from './lib/firebase';
+import { GroupHistory } from './components/GroupHistory';
 
 const AppContent: React.FC = () => {
   const { state, dispatch, currentAccount } = useApp();
@@ -29,8 +30,8 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // Gate 2: Logged in but not onboarded → show welcome + onboarding
-  const inApp = state.onboarded && state.user;
+  // Gate 2: Logged in but not in a group → show welcome + history
+  const inApp = state.group || state.mode === 'solo';
 
   const handleLogout = async () => {
     await logOut();
@@ -38,13 +39,21 @@ const AppContent: React.FC = () => {
     showToast('Signed out');
   };
 
+  const handleLeaveGroup = async () => {
+    if (state.loggedInUserId) {
+        await saveUserGroup(state.loggedInUserId, null, null);
+    }
+    dispatch({ type: 'LEAVE_GROUP' });
+  };
+
   return (
     <>
-      <Navbar
-        onOpenModal={() => setIsModalOpen(true)}
-        onOpenAdmin={() => setIsAdminOpen(true)}
-        onLogout={handleLogout}
-      />
+        <Navbar 
+          onOpenModal={() => setIsModalOpen(true)}
+          onOpenAdmin={() => setIsAdminOpen(true)}
+          onLogout={handleLogout}
+          onLeaveGroup={handleLeaveGroup}
+        />
 
       <div className="container">
         {!inApp ? (
@@ -57,6 +66,7 @@ const AppContent: React.FC = () => {
             <button className="btn btn-primary" style={{ padding: '14px 32px', fontSize: '1rem' }} onClick={() => setIsModalOpen(true)}>
               Get Started →
             </button>
+            {state.loggedInUserId && <GroupHistory />}
           </div>
         ) : (
           <Dashboard />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { showToast } from './Toast';
-import { generateGroupCode, joinGroupOnServer, updateGroupState } from '../lib/firebase';
+import { generateGroupCode, joinGroupOnServer, updateGroupState, saveUserGroup } from '../lib/firebase';
 
 interface OnboardingModalProps {
     isOpen: boolean;
@@ -50,13 +50,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         if (codeStatus !== 'ready' || !generatedCode) { showToast('⚠ Wait for code generation...'); return; }
 
         // Dispatch locally first so UI updates immediately
-        dispatch({ type: 'JOIN_GROUP', name: name.trim(), code: generatedCode, userId: currentAccount.id, isCreator: true });
+        dispatch({ type: 'JOIN_GROUP', name: name.trim(), code: generatedCode, userId: currentAccount.id, isCreator: true, groupName: groupName.trim() });
         showToast(`✓ Group "${groupName.trim()}" created! Code: ${generatedCode}`);
         resetAndClose();
 
         // Then try to save group name to Firestore (non-blocking)
         try {
             await updateGroupState(generatedCode, { groupName: groupName.trim(), createdAt: Date.now() });
+            await saveUserGroup(currentAccount.id, generatedCode, 'group');
         } catch (err) {
             console.warn('Firestore write failed (group will sync later):', err);
         }
@@ -82,15 +83,29 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         }
 
         dispatch({ type: 'JOIN_GROUP', name: name.trim(), code, userId: currentAccount.id, isCreator: false });
+        
+        try {
+            await saveUserGroup(currentAccount.id, code, 'group');
+        } catch (err) {
+            console.warn("Could not save user group:", err);
+        }
+
         showToast(`✓ Joined group ${code} as ${name.trim()}`);
         resetAndClose();
         setJoining(false);
     };
 
-    const handleSolo = () => {
+    const handleSolo = async () => {
         if (!name.trim()) { showToast('⚠ Enter your name'); return; }
         if (!currentAccount) { showToast('⚠ Please sign in first'); return; }
         dispatch({ type: 'SET_SOLO', name: name.trim(), userId: currentAccount.id });
+        
+        try {
+            await saveUserGroup(currentAccount.id, null, 'solo');
+        } catch (err) {
+            console.warn("Could not save solo mode:", err);
+        }
+        
         showToast(`✓ Started solo mode as ${name.trim()}`);
         resetAndClose();
     };

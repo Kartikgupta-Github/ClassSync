@@ -103,6 +103,7 @@ export const ALL_PERMISSIONS: Permission[] = Object.keys(PERMISSION_LABELS) as P
 export interface AppState {
     user: string | null;
     group: string | null;
+    groupName?: string;
     members: Member[];
     tasks: Task[];
     currentUser: number | null;
@@ -113,6 +114,8 @@ export interface AppState {
         college: string;
         semester: string;
     } | null;
+    // History
+    joinedGroups: string[];
     // Auth
     accounts: UserAccount[];
     loggedInUserId: string | null;

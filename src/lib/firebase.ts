@@ -20,17 +20,18 @@ import {
     setDoc,
     getDoc,
     onSnapshot,
+    arrayUnion,
 } from 'firebase/firestore';
 import { getColor } from '../types';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyC6kvo-bZeVQnwnjpDnsdNTd2cbDRXVCJo",
-    authDomain: "classsync-123e2.firebaseapp.com",
-    projectId: "classsync-123e2",
-    storageBucket: "classsync-123e2.firebasestorage.app",
-    messagingSenderId: "709587427699",
-    appId: "1:709587427699:web:64b687df1cdb35c99d2506",
-    measurementId: "G-MZB6WYWB6E",
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -113,7 +114,14 @@ export function generateGroupCode(): string {
 
 export async function saveUserGroup(uid: string, groupCode: string | null, mode: 'group' | 'solo' | null) {
     const userRef = doc(db, 'users', uid);
-    await setDoc(userRef, { lastGroupCode: groupCode, mode }, { merge: true });
+    const updateData: any = { lastGroupCode: groupCode, mode };
+    
+    // Only append to history if it's a valid group code
+    if (groupCode && mode === 'group') {
+        updateData.joinedGroups = arrayUnion(groupCode);
+    }
+    
+    await setDoc(userRef, updateData, { merge: true });
 }
 
 export async function getUserData(uid: string) {
