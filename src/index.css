@@ -603,10 +603,26 @@
     @apply flex;
     gap: 0;
     margin-bottom: 14px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  .steps-progress::-webkit-scrollbar {
+    height: 4px;
+  }
+  .steps-progress::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .steps-progress::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
   }
 
   .progress-step {
     @apply flex-1 flex items-center relative;
+    min-width: 140px;
   }
 
   .progress-step:not(:last-child)::after {
