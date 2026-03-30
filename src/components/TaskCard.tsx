@@ -157,15 +157,16 @@ const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
             <div className="steps-progress">
                 {task.steps.map((s, i) => (
                     <div key={i} className={`progress-step ${up[i] ? 'completed' : ''}`}>
-                        <div
-                            className={`step-circle ${up[i] ? 'done' : ''}`}
+                        <div 
+                            style={{ display: 'flex', alignItems: 'center', cursor: canToggleSteps ? 'pointer' : 'not-allowed', zIndex: 2 }}
                             onClick={() => handleToggleStep(i)}
                             title={canToggleSteps ? s : `⛔ Can't modify ${isOwnIdx(state.currentUser!) ? '' : "others'"} steps`}
-                            style={{ cursor: canToggleSteps ? 'pointer' : 'not-allowed' }}
                         >
-                            {up[i] ? '✓' : i + 1}
+                            <div className={`step-circle ${up[i] ? 'done' : ''}`}>
+                                {up[i] ? '✓' : i + 1}
+                            </div>
+                            <span className="step-label">{s}</span>
                         </div>
-                        <span className="step-label">{s}</span>
                     </div>
                 ))}
             </div>
