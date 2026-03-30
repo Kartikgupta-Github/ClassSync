@@ -5,16 +5,16 @@
    Tailwind v4 Theme — ClassSync Custom Tokens
    ══════════════════════════════════════════════ */
 @theme {
-  --color-bg: #0a0a0f;
-  --color-surface: #111118;
-  --color-card: #16161f;
-  --color-border: #252535;
-  --color-accent: #7c6bff;
-  --color-accent2: #ff6b6b;
-  --color-accent3: #6bffb8;
-  --color-text: #e8e8f0;
-  --color-muted: #6b6b88;
-  --color-warn: #ffb347;
+  --color-bg: #fffbf0;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-border: #000000;
+  --color-accent: #ff3366;
+  --color-accent2: #00e5ff;
+  --color-accent3: #ffcc00;
+  --color-text: #000000;
+  --color-muted: #444444;
+  --color-warn: #ff6b6b;
 
   --font-heading: 'Syne', sans-serif;
   --font-mono: 'DM Mono', monospace;
@@ -36,18 +36,6 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
-
-  body::before {
-    content: '';
-    position: fixed;
-    top: -40%;
-    left: -20%;
-    width: 70%;
-    height: 70%;
-    background: radial-gradient(ellipse, rgba(124, 107, 255, 0.08) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
 }
 
 /* ══════════════════════════════════════════════
@@ -60,9 +48,8 @@
     @apply flex items-center justify-between sticky top-0 z-50;
     position: relative;
     padding: 14px 20px;
-    border-bottom: 1px solid var(--color-border);
-    background: rgba(10, 10, 15, 0.92);
-    backdrop-filter: blur(12px);
+    border-bottom: 3px solid var(--color-border);
+    background: var(--color-bg);
   }
 
   .logo {
@@ -73,7 +60,8 @@
   }
 
   .logo-dot {
-    @apply w-2.5 h-2.5 rounded-full;
+    @apply w-3 h-3;
+    border: 2px solid #000;
     background: var(--color-accent);
     animation: pulse 2s infinite;
   }
@@ -129,12 +117,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px 20px;
-    background: rgba(10, 10, 15, 0.8);
-    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg);
+    border-bottom: 3px solid var(--color-border);
     position: sticky;
     top: 55px;
     z-index: 49;
-    backdrop-filter: blur(8px);
   }
 
   .sub-bar-title {
@@ -216,11 +203,14 @@
   /* ── INPUTS & BUTTONS ── */
   input,
   select {
-    @apply rounded-lg outline-none transition-colors;
+    @apply outline-none transition-colors;
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    border: 3px solid var(--color-border);
+    border-radius: 0;
+    box-shadow: 4px 4px 0px var(--color-border);
     color: var(--color-text);
     font-family: var(--font-mono);
+    font-weight: 500;
     font-size: 0.9rem;
     padding: 10px 14px;
     flex: 1;
@@ -229,48 +219,56 @@
 
   input:focus,
   select:focus {
-    border-color: var(--color-accent);
+    box-shadow: 2px 2px 0px var(--color-border);
+    transform: translate(2px, 2px);
+    background: #fff;
   }
 
   .btn {
-    @apply rounded-lg font-bold text-sm cursor-pointer transition-all;
+    @apply font-bold text-sm cursor-pointer transition-all;
     padding: 10px 22px;
-    border: none;
+    border: 3px solid var(--color-border);
+    border-radius: 0;
+    box-shadow: 4px 4px 0px var(--color-border);
     font-family: var(--font-heading);
     white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .btn-primary {
     background: var(--color-accent);
-    color: #fff;
+    color: #000;
   }
 
   .btn-primary:hover {
-    background: #6a5aee;
-    transform: translateY(-1px);
+    background: var(--color-accent);
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--color-border);
   }
 
   .btn-ghost {
-    background: transparent;
-    color: var(--color-muted);
-    border: 1px solid var(--color-border);
+    background: #fff;
+    color: #000;
   }
 
   .btn-ghost:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
+    background: var(--color-accent3);
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--color-border);
   }
 
   .btn-danger {
-    background: transparent;
-    color: var(--color-accent2);
-    border: 1px solid rgba(255, 107, 107, 0.3);
+    background: var(--color-accent2);
+    color: #000;
     padding: 6px 14px;
     font-size: 0.78rem;
   }
 
   .btn-danger:hover {
-    background: rgba(255, 107, 107, 0.1);
+    background: var(--color-warn);
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--color-border);
   }
 
   .btn-sm {
@@ -281,6 +279,7 @@
   .btn:disabled {
     @apply opacity-40 cursor-not-allowed;
     transform: none !important;
+    box-shadow: none !important;
   }
 
   /* ── USER BAR ── */
@@ -321,9 +320,15 @@
 
   .stat-card {
     background: var(--color-card);
-    border: 1px solid var(--color-border);
-    @apply rounded-xl;
+    border: 3px solid var(--color-border);
+    box-shadow: 4px 4px 0px var(--color-border);
     padding: 16px 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .stat-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--color-border);
   }
 
   .stat-val {
@@ -357,8 +362,8 @@
   /* ── CREATE PANEL ── */
   .create-panel {
     background: var(--color-card);
-    border: 1px solid var(--color-border);
-    @apply rounded-xl;
+    border: 3px solid var(--color-border);
+    box-shadow: 6px 6px 0px var(--color-border);
     padding: 24px;
     margin-bottom: 28px;
     animation: slideDown 0.2s ease;
@@ -397,11 +402,13 @@
   }
 
   .step-tag {
-    @apply flex items-center gap-1.5 rounded-md cursor-pointer transition-all;
+    @apply flex items-center gap-1.5 cursor-pointer transition-all;
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    border: 3px solid var(--color-border);
+    box-shadow: 2px 2px 0px var(--color-border);
     padding: 6px 12px;
     font-size: 0.8rem;
+    font-weight: 700;
     font-family: var(--font-mono);
   }
 
@@ -412,11 +419,13 @@
   }
 
   .step-num {
-    @apply rounded-full flex items-center justify-center font-bold;
-    width: 18px;
-    height: 18px;
+    @apply flex items-center justify-center font-bold;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border);
     font-size: 0.65rem;
-    background: var(--color-border);
+    background: #fff;
+    color: #000;
   }
 
   .step-tag.active .step-num {
@@ -431,8 +440,9 @@
 
   .task-card {
     background: var(--color-card);
-    border: 1px solid var(--color-border);
-    @apply rounded-xl transition-all;
+    border: 3px solid var(--color-border);
+    box-shadow: 6px 6px 0px var(--color-border);
+    @apply transition-all;
     padding: 20px 24px;
     animation: fadeIn 0.3s ease;
   }
@@ -450,8 +460,8 @@
   }
 
   .task-card:hover {
-    border-color: rgba(124, 107, 255, 0.4);
-    transform: translateY(-1px);
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0px var(--color-border);
   }
 
   .task-card.urgent {
@@ -588,12 +598,13 @@
   }
 
   .step-circle {
-    @apply rounded-full flex items-center justify-center font-bold relative shrink-0 transition-all;
-    width: 24px;
-    height: 24px;
-    border: 2px solid var(--color-border);
+    @apply flex items-center justify-center font-bold relative shrink-0 transition-all;
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--color-border);
+    box-shadow: 2px 2px 0px var(--color-border);
     background: var(--color-surface);
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     font-family: var(--font-mono);
     z-index: 1;
     color: var(--color-muted);
@@ -601,14 +612,15 @@
   }
 
   .step-circle:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
+    background: var(--color-accent);
+    color: #000;
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px var(--color-border);
   }
 
   .step-circle.done {
     background: var(--color-accent);
-    border-color: var(--color-accent);
-    color: #fff;
+    color: #000;
   }
 
   .step-label {
@@ -626,15 +638,16 @@
   /* ── PROGRESS BAR ── */
   .progress-bar-wrap {
     background: var(--color-surface);
-    @apply rounded;
-    height: 4px;
+    border: 3px solid var(--color-border);
+    height: 12px;
     margin-bottom: 14px;
     @apply overflow-hidden;
   }
 
   .progress-bar-fill {
-    @apply h-full rounded;
+    @apply h-full;
     background: var(--color-accent);
+    border-right: 3px solid var(--color-border);
     transition: width 0.4s ease;
   }
 
@@ -643,7 +656,7 @@
     @apply flex items-center gap-2.5 flex-wrap;
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-border);
   }
 
   .cp-label {
@@ -659,15 +672,17 @@
 
   .cp-avatar {
     @apply rounded-full font-bold flex items-center justify-center text-white cursor-pointer transition-transform;
-    width: 22px;
-    height: 22px;
-    border: 2px solid var(--color-card);
-    margin-left: -4px;
-    font-size: 0.6rem;
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--color-border);
+    box-shadow: 2px 2px 0px var(--color-border);
+    margin-left: -6px;
+    font-size: 0.65rem;
   }
 
   .cp-avatar:hover {
-    transform: translateY(-3px);
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px var(--color-border);
     z-index: 10;
   }
 
@@ -736,8 +751,9 @@
 
   .modal {
     background: var(--color-card);
-    border: 1px solid var(--color-border);
-    @apply rounded-2xl w-full;
+    border: 3px solid var(--color-border);
+    box-shadow: 8px 8px 0px var(--color-border);
+    @apply w-full;
     padding: 28px;
     max-width: 480px;
     animation: modalIn 0.2s ease;
@@ -763,18 +779,18 @@
 
   /* ── TOAST ── */
   .toast {
-    @apply fixed;
+    @apply fixed font-bold;
     bottom: 24px;
     right: 24px;
     background: var(--color-surface);
-    border: 1px solid var(--color-accent);
-    @apply rounded-lg;
+    border: 3px solid var(--color-border);
+    box-shadow: 6px 6px 0px var(--color-border);
     padding: 12px 20px;
-    font-size: 0.85rem;
-    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-family: var(--font-heading);
     z-index: 300;
     animation: toastIn 0.3s ease;
-    color: var(--color-accent);
+    color: #000;
   }
 
   @keyframes toastIn {
@@ -815,8 +831,8 @@
 
   .auth-card {
     background: var(--color-card);
-    border: 1px solid var(--color-border);
-    @apply rounded-2xl;
+    border: 3px solid var(--color-border);
+    box-shadow: 8px 8px 0px var(--color-border);
     padding: 32px;
   }
 
