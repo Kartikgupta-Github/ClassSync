@@ -230,7 +230,7 @@ const AuthScreen: React.FC = () => {
                             Continue as Guest
                         </button>
 
-                        <button className="btn btn-ghost" style={{ width: '100%' }} onClick={() => switchView('signup')}>
+                        <button className="btn btn-ghost" style={{ width: '100%', whiteSpace: 'normal', lineHeight: '1.4' }} onClick={() => switchView('signup')}>
                             Don't have an account? <strong>Sign Up</strong>
                         </button>
                     </>
@@ -281,7 +281,7 @@ const AuthScreen: React.FC = () => {
                             Continue as Guest
                         </button>
 
-                        <button className="btn btn-ghost" style={{ width: '100%' }} onClick={() => switchView('login')}>
+                        <button className="btn btn-ghost" style={{ width: '100%', whiteSpace: 'normal', lineHeight: '1.4' }} onClick={() => switchView('login')}>
                             Already have an account? <strong>Sign In</strong>
                         </button>
                     </>
