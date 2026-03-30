@@ -60,7 +60,7 @@ export const exportToPDF = (state: AppState) => {
     const html = `
 <!DOCTYPE html>
 <html><head>
-<title>ClassSync - Pending Tasks</title>
+<title>Assignova - Pending Tasks</title>
 <style>
   body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #1a1a2e; }
   h1 { font-size: 24px; margin-bottom: 4px; }
@@ -75,7 +75,7 @@ export const exportToPDF = (state: AppState) => {
   .step.done { background: #d4edda; border-color: #28a745; text-decoration: line-through; }
 </style>
 </head><body>
-<h1>📋 ClassSync — Pending Tasks</h1>
+<h1>📋 Assignova — Pending Tasks</h1>
 <div class="subtitle">Group: ${state.group || 'Solo'} · ${state.user} · Exported ${new Date().toLocaleDateString('en-IN')}</div>
 ${pending.map(t => {
         const up = t.memberProgress[state.currentUser!] || new Array(t.steps.length).fill(false);

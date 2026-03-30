@@ -110,7 +110,7 @@ const AuthScreen: React.FC = () => {
         setLoadingEmail(true);
         setErrors({});
         try {
-            const tempEmail = `guest_${Date.now()}@classsync.app`;
+            const tempEmail = `guest_${Date.now()}@assignova.app`;
             const tempPassword = `Guest123!${Math.random()}`;
             const user = await signUpWithEmail(tempEmail, tempPassword);
             await handleFirebaseUser(user);
@@ -186,7 +186,7 @@ const AuthScreen: React.FC = () => {
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
                     <div className="logo-dot" />
-                    <span style={{ fontSize: '1.5rem', fontWeight: 800 }}>ClassSync</span>
+                    <span style={{ fontSize: '1.5rem', fontWeight: 800 }}>Assignova</span>
                 </div>
             </div>
 

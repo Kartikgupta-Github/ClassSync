@@ -19,7 +19,7 @@ const AppContent: React.FC = () => {
     return (
       <>
         <nav>
-          <div className="logo"><div className="logo-dot"></div>ClassSync</div>
+          <div className="logo"><div className="logo-dot"></div>Assignova</div>
           <div className="nav-right"></div>
         </nav>
         <div className="container">

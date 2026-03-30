@@ -146,7 +146,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
                 {/* ═══ CHOOSE MODE ═══ */}
                 {step === 'choose' && (
                     <>
-                        <h2 style={{ textAlign: 'center', marginBottom: '8px' }}>🎓 Get Started with ClassSync</h2>
+                        <h2 style={{ textAlign: 'center', marginBottom: '8px' }}>🎓 Get Started with Assignova</h2>
                         <p style={{ textAlign: 'center', color: 'var(--muted)', fontFamily: '"DM Mono", monospace', fontSize: '0.82rem', marginBottom: '24px' }}>
                             Choose how you want to track your assignments
                         </p>

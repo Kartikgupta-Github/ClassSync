@@ -11,7 +11,7 @@ const Navbar: React.FC<{ onOpenModal: () => void; onOpenAdmin: () => void; onLog
             <nav>
                 <div className="logo">
                     <div className="logo-dot"></div>
-                    ClassSync
+                    Assignova
                 </div>
 
                 {/* Center: group name on desktop only */}
