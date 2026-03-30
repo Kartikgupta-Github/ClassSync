@@ -44,8 +44,15 @@
 @layer components {
 
   /* ── NAV ── */
+  .sticky-header {
+    @apply sticky top-0 z-50;
+    background: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+  }
+
   nav {
-    @apply flex items-center justify-between sticky top-0 z-50;
+    @apply flex items-center justify-between;
     position: relative;
     padding: 14px 20px;
     border-bottom: 3px solid var(--color-border);
@@ -119,9 +126,6 @@
     padding: 8px 20px;
     background: var(--color-bg);
     border-bottom: 3px solid var(--color-border);
-    position: sticky;
-    top: 55px;
-    z-index: 49;
   }
 
   .sub-bar-title {

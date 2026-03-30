@@ -6,7 +6,7 @@ const Navbar: React.FC<{ onOpenModal: () => void; onOpenAdmin: () => void; onLog
     const inGroup = state.group || state.mode === 'solo';
 
     return (
-        <>
+        <header className="sticky-header">
             {/* Main Nav — always clean and minimal */}
             <nav>
                 <div className="logo">
@@ -62,7 +62,7 @@ const Navbar: React.FC<{ onOpenModal: () => void; onOpenAdmin: () => void; onLog
                     </div>
                 </div>
             )}
-        </>
+        </header>
     );
 };
 
