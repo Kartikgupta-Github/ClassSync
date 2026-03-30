@@ -239,7 +239,7 @@
 
   .btn-primary {
     background: var(--color-accent);
-    color: #fff;
+    color: #000;
   }
 
   .btn-primary:hover {
@@ -249,14 +249,17 @@
   }
 
   .btn-ghost {
-    background: #fff;
-    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .btn-ghost:hover {
-    background: var(--color-accent3);
+    background: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); 
+    color: var(--color-text);
   }
 
   .btn-danger {
@@ -427,15 +430,15 @@
     @apply flex items-center justify-center font-bold;
     width: 20px;
     height: 20px;
-    border: 2px solid var(--color-border);
+    border: 1px solid var(--color-border);
     font-size: 0.65rem;
-    background: #fff;
-    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text);
   }
 
   .step-tag.active .step-num {
     background: var(--color-accent3);
-    color: #fff;
+    color: #000;
   }
 
   /* ── TASK CARDS ── */
