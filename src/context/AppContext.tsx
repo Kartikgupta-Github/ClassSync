@@ -15,6 +15,7 @@ type Action =
     | { type: 'JOIN_GROUP'; name: string; code: string; userId: string; isCreator?: boolean; groupName?: string }
     | { type: 'SET_SOLO'; name: string; userId: string }
     | { type: 'LEAVE_GROUP' }
+    | { type: 'LEAVE_GROUP_HISTORY'; code: string }
     // Tasks
     | { type: 'ADD_TASK'; task: Task }
     | { type: 'DELETE_TASK'; taskId: number }
@@ -147,6 +148,14 @@ function reducer(state: AppState, action: Action): AppState {
                 tasks: [],
                 members: [],
                 onboarded: true, // They are onboarded, just currently viewing the dashboard menu
+            };
+        }
+
+        case 'LEAVE_GROUP_HISTORY': {
+            const upcCode = action.code.toUpperCase();
+            return {
+                ...state,
+                joinedGroups: state.joinedGroups.filter(c => c !== upcCode)
             };
         }
 
@@ -332,7 +341,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     // Wrap dispatch to track local changes
     const wrappedDispatch = (action: Action) => {
-        if (['JOIN_GROUP', 'LEAVE_GROUP', 'FIREBASE_LOGIN', 'LOAD_STATE'].includes(action.type)) {
+        if (['JOIN_GROUP', 'LEAVE_GROUP', 'LEAVE_GROUP_HISTORY', 'FIREBASE_LOGIN', 'LOAD_STATE'].includes(action.type)) {
             isLocalChange.current = false;
             isSynced.current = false; // Force re-sync from server before pushing
         } else if (action.type !== 'SYNC_GROUP') {

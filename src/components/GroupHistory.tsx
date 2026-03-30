@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, leaveGroupOnServer, deleteGroupOnServer } from '../lib/firebase';
 import { showToast } from './Toast';
 
 interface GroupCard {
     code: string;
     name: string;
     loading: boolean;
+    isAdmin?: boolean;
 }
 
 export const GroupHistory: React.FC = () => {
@@ -30,10 +31,13 @@ export const GroupHistory: React.FC = () => {
                     const docRef = doc(db, 'groups', code.toUpperCase());
                     const snap = await getDoc(docRef);
                     if (snap.exists()) {
+                        const data = snap.data();
+                        const isAdmin = data.accounts?.find((a: any) => a.id === currentAccount?.id)?.role === 'admin';
                         groupsData.push({
                             code,
-                            name: snap.data().groupName || 'Unnamed Group',
-                            loading: false
+                            name: data.groupName || 'Unnamed Group',
+                            loading: false,
+                            isAdmin
                         });
                     }
                 } catch (err) {
@@ -82,6 +86,39 @@ export const GroupHistory: React.FC = () => {
         }
     };
 
+    const handleLeave = async (code: string) => {
+        if (!currentAccount) return;
+        if (!confirm(`Are you sure you want to completely leave ${code}? You will have to rejoin with the code.`)) return;
+        if (!confirm(`Are you absolutely sure? This will remove you from the group.`)) return;
+        
+        try {
+            await leaveGroupOnServer(currentAccount.id, code);
+            dispatch({ type: 'LEAVE_GROUP_HISTORY', code });
+            setHistory(prev => prev.filter(g => g.code !== code));
+            showToast('✓ Left the group.');
+        } catch (e) {
+            console.error(e);
+            showToast('❌ Failed to leave group.');
+        }
+    };
+
+    const handleDelete = async (code: string) => {
+        if (!confirm(`⚠️ DANGER: Are you sure you want to permanently DELETE group ${code}? This affects all members and cannot be undone.`)) return;
+        if (!confirm(`FINAL WARNING: This will permanently erase the group ${code}. Proceed?`)) return;
+        
+        try {
+            await deleteGroupOnServer(code);
+            // After deleting, they also "leave" it
+            if (currentAccount) await leaveGroupOnServer(currentAccount.id, code);
+            dispatch({ type: 'LEAVE_GROUP_HISTORY', code });
+            setHistory(prev => prev.filter(g => g.code !== code));
+            showToast('🗑️ Group permanently deleted.');
+        } catch (e) {
+            console.error(e);
+            showToast('❌ Failed to delete group.');
+        }
+    };
+
     if (state.joinedGroups.length === 0) return null;
 
     return (
@@ -100,13 +137,12 @@ export const GroupHistory: React.FC = () => {
                     {history.map(group => (
                         <div 
                             key={group.code}
-                            onClick={() => !group.loading && handleRejoin(group.code)}
                             style={{
                                 background: 'var(--surface)',
-                                border: '1px solid var(--border)',
-                                borderRadius: '12px',
+                                border: '3px solid var(--border)',
+                                boxShadow: '4px 4px 0px var(--border)',
+                                borderRadius: '0',
                                 padding: '16px',
-                                cursor: group.loading ? 'default' : 'pointer',
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
@@ -115,31 +151,49 @@ export const GroupHistory: React.FC = () => {
                             }}
                             onMouseEnter={e => {
                                 if (!group.loading) {
-                                    e.currentTarget.style.borderColor = 'var(--primary)';
-                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                                    e.currentTarget.style.boxShadow = '6px 6px 0px var(--border)';
                                 }
                             }}
                             onMouseLeave={e => {
                                 if (!group.loading) {
-                                    e.currentTarget.style.borderColor = 'var(--border)';
-                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.transform = 'translate(0, 0)';
+                                    e.currentTarget.style.boxShadow = '4px 4px 0px var(--border)';
                                 }
                             }}
                         >
-                            <div>
-                                <div style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '4px', color: 'var(--text)' }}>
-                                    {group.name}
+                            <div style={{ flex: 1, cursor: group.loading ? 'default' : 'pointer' }} onClick={() => !group.loading && handleRejoin(group.code)}>
+                                <div style={{ fontWeight: 800, fontSize: '1.2rem', marginBottom: '4px', color: 'var(--text)' }}>
+                                    {group.name} {group.isAdmin && <span style={{ fontSize: '0.65rem', color: '#fff', background: 'var(--accent)', padding: '2px 6px', border: '2px solid #000', marginLeft: '8px', verticalAlign: 'middle', textTransform: 'uppercase', letterSpacing: '1px' }}>👑 Admin</span>}
                                 </div>
                                 <div style={{ fontFamily: '"DM Mono", monospace', fontSize: '0.85rem', color: 'var(--muted)' }}>
                                     Code: {group.code}
                                 </div>
                             </div>
                             
-                            <div>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                {group.isAdmin && (
+                                    <button 
+                                        className="btn btn-sm" 
+                                        style={{ background: 'var(--accent2)', color: '#000', padding: '6px 10px' }}
+                                        onClick={(e) => { e.stopPropagation(); handleDelete(group.code); }}
+                                        title="Delete Group"
+                                    >
+                                        🗑️
+                                    </button>
+                                )}
+                                <button 
+                                    className="btn btn-sm btn-ghost"
+                                    style={{ padding: '6px 10px' }}
+                                    onClick={(e) => { e.stopPropagation(); handleLeave(group.code); }}
+                                    title="Leave Group"
+                                >
+                                    🚪
+                                </button>
                                 {group.loading ? (
-                                    <div className="spinner" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
+                                    <div className="spinner" style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent', marginLeft: '8px' }} />
                                 ) : (
-                                    <div style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>→</div>
+                                    <div style={{ color: 'var(--text)', fontSize: '1.5rem', fontWeight: 800, cursor: 'pointer', marginLeft: '8px', border: '3px solid #000', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent3)', transition: 'transform 0.1s' }} onClick={() => !group.loading && handleRejoin(group.code)}>→</div>
                                 )}
                             </div>
                         </div>

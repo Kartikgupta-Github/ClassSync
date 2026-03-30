@@ -21,6 +21,9 @@ import {
     getDoc,
     onSnapshot,
     arrayUnion,
+    arrayRemove,
+    updateDoc,
+    deleteDoc,
 } from 'firebase/firestore';
 import { getColor } from '../types';
 
@@ -140,6 +143,34 @@ export function syncGroupData(groupCode: string, callback: (data: any) => void) 
 export async function updateGroupState(groupCode: string, state: any) {
     const docRef = doc(db, 'groups', groupCode.toUpperCase());
     await setDoc(docRef, state, { merge: true });
+}
+
+export async function leaveGroupOnServer(uid: string, groupCode: string) {
+    try {
+        const userRef = doc(db, 'users', uid);
+        await updateDoc(userRef, { joinedGroups: arrayRemove(groupCode.toUpperCase()) });
+
+        const docRef = doc(db, 'groups', groupCode.toUpperCase());
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const accounts = (data.accounts || []).filter((a: any) => a.id !== uid);
+            await updateDoc(docRef, { accounts });
+        }
+    } catch (e) {
+        console.error("leaveGroupOnServer error:", e);
+        throw e;
+    }
+}
+
+export async function deleteGroupOnServer(groupCode: string) {
+    try {
+        const docRef = doc(db, 'groups', groupCode.toUpperCase());
+        await deleteDoc(docRef);
+    } catch (e) {
+        console.error("deleteGroupOnServer error:", e);
+        throw e;
+    }
 }
 
 // ── Storage helpers ──
