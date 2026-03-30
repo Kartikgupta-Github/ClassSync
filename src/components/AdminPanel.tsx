@@ -16,7 +16,12 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         showToast(`Updated ${role} permissions`);
     };
 
-    const changeRole = (userId: string, role: Role) => {
+    const changeRole = (userId: string, role: Role, memberIdx: number) => {
+        // Creator (memberIdx 0) can never be demoted
+        if (memberIdx === 0) {
+            showToast('⚠️ The group creator cannot be changed from Admin.');
+            return;
+        }
         if (userId === currentAccount?.id && role === 'member') {
             showToast('⚠️ You cannot demote yourself. Another admin must do it.');
             return;
@@ -53,11 +58,15 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                 display: 'flex', alignItems: 'center', gap: '10px',
                                 background: 'var(--surface)', border: '1px solid var(--border)',
                                 borderRadius: '10px', padding: '10px 14px',
+                                overflow: 'hidden', flexWrap: 'wrap',
                             }}>
-                                <div className="avatar" style={{ background: m.color }}>{m.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}</div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{m.name} {isSelf && <span style={{ color: 'var(--accent)', fontWeight: 400, fontSize: '0.75rem' }}>(You)</span>}</div>
-                                    <div style={{ fontSize: '0.72rem', color: 'var(--muted)', fontFamily: '"DM Mono", monospace' }}>
+                                <div className="avatar" style={{ background: m.color, flexShrink: 0 }}>{m.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}</div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontWeight: 700, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        {m.name} {isSelf && <span style={{ color: 'var(--accent)', fontWeight: 400, fontSize: '0.75rem' }}>(You)</span>}
+                                        {mi === 0 && <span style={{ fontSize: '0.65rem', color: 'var(--warn)' }}> 👑 Creator</span>}
+                                    </div>
+                                    <div style={{ fontSize: '0.72rem', color: 'var(--muted)', fontFamily: '"DM Mono", monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                         {account?.email || 'No account linked'}
                                     </div>
                                 </div>
@@ -67,16 +76,16 @@ const AdminPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                 {hasPermission('change_roles') && account && (
                                     <select
                                         value={account.role}
-                                        disabled={isSelf && account.role === 'admin'}
-                                        onChange={e => changeRole(account.id, e.target.value as Role)}
-                                        style={{ width: 'auto', minWidth: '100px', padding: '4px 8px', fontSize: '0.75rem' }}
-                                        title={isSelf && account.role === 'admin' ? "You cannot demote yourself" : ""}
+                                        disabled={mi === 0 || (isSelf && account.role === 'admin')}
+                                        onChange={e => changeRole(account.id, e.target.value as Role, mi)}
+                                        style={{ width: 'auto', minWidth: '90px', padding: '4px 8px', fontSize: '0.75rem', opacity: mi === 0 ? 0.5 : 1 }}
+                                        title={mi === 0 ? 'Group creator cannot be changed' : isSelf && account.role === 'admin' ? 'You cannot demote yourself' : ''}
                                     >
                                         <option value="admin">👑 Admin</option>
                                         <option value="member">👤 Member</option>
                                     </select>
                                 )}
-                                {hasPermission('manage_members') && account?.role !== 'admin' && (
+                                {hasPermission('manage_members') && account?.role !== 'admin' && mi !== 0 && (
                                     <button className="btn btn-danger btn-sm" onClick={() => removeMember(mi)}>Remove</button>
                                 )}
                             </div>
