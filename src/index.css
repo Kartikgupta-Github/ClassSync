@@ -5,16 +5,16 @@
    Tailwind v4 Theme — ClassSync Custom Tokens
    ══════════════════════════════════════════════ */
 @theme {
-  --color-bg: #fffbf0;
-  --color-surface: #ffffff;
-  --color-card: #ffffff;
-  --color-border: #000000;
-  --color-accent: #ff3366;
-  --color-accent2: #00e5ff;
-  --color-accent3: #ffcc00;
-  --color-text: #000000;
-  --color-muted: #444444;
-  --color-warn: #ff6b6b;
+  --color-bg: #0f172a;
+  --color-surface: rgba(30, 41, 59, 0.4);
+  --color-card: rgba(30, 41, 59, 0.6);
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-accent: #38bdf8;
+  --color-accent2: #c084fc;
+  --color-accent3: #f472b6;
+  --color-text: #f8fafc;
+  --color-muted: #94a3b8;
+  --color-warn: #fb7185;
 
   --font-heading: 'Syne', sans-serif;
   --font-mono: 'DM Mono', monospace;
@@ -33,8 +33,7 @@
   body {
     @apply bg-bg text-text antialiased;
     font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
+    min-height: 100vh; overflow-x: hidden; background: radial-gradient(circle at -20% 0%, rgba(192, 132, 252, 0.15), transparent 40vw), radial-gradient(circle at 120% 100%, rgba(56, 189, 248, 0.1), transparent 40vw), var(--color-bg);
   }
 }
 
@@ -46,17 +45,15 @@
   /* ── NAV ── */
   .sticky-header {
     @apply sticky top-0 z-50;
-    background: var(--color-bg);
-    display: flex;
-    flex-direction: column;
+    background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: flex; flex-direction: column;
   }
 
   nav {
     @apply flex items-center justify-between;
     position: relative;
     padding: 14px 20px;
-    border-bottom: 3px solid var(--color-border);
-    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    background: transparent;
   }
 
   .logo {
@@ -124,8 +121,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px 20px;
-    background: var(--color-bg);
-    border-bottom: 3px solid var(--color-border);
+    background: transparent;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .sub-bar-title {
@@ -209,9 +206,9 @@
   select {
     @apply outline-none transition-colors;
     background: var(--color-surface);
-    border: 3px solid var(--color-border);
-    border-radius: 0;
-    box-shadow: 4px 4px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     color: var(--color-text);
     font-family: var(--font-mono);
     font-weight: 500;
@@ -223,17 +220,17 @@
 
   input:focus,
   select:focus {
-    box-shadow: 2px 2px 0px var(--color-border);
-    transform: translate(2px, 2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    transform: translateY(-2px);
     background: #fff;
   }
 
   .btn {
     @apply font-bold text-sm cursor-pointer transition-all;
     padding: 10px 22px;
-    border: 3px solid var(--color-border);
-    border-radius: 0;
-    box-shadow: 4px 4px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     font-family: var(--font-heading);
     white-space: nowrap;
     text-transform: uppercase;
@@ -242,37 +239,37 @@
 
   .btn-primary {
     background: var(--color-accent);
-    color: #000;
+    color: #fff;
   }
 
   .btn-primary:hover {
     background: var(--color-accent);
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px var(--color-border);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   }
 
   .btn-ghost {
     background: #fff;
-    color: #000;
+    color: #fff;
   }
 
   .btn-ghost:hover {
     background: var(--color-accent3);
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px var(--color-border);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   }
 
   .btn-danger {
     background: var(--color-accent2);
-    color: #000;
+    color: #fff;
     padding: 6px 14px;
     font-size: 0.78rem;
   }
 
   .btn-danger:hover {
     background: var(--color-warn);
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px var(--color-border);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   }
 
   .btn-sm {
@@ -323,16 +320,18 @@
   }
 
   .stat-card {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     background: var(--color-card);
-    border: 3px solid var(--color-border);
-    box-shadow: 4px 4px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     padding: 16px 20px;
     transition: transform 0.2s, box-shadow 0.2s;
   }
 
   .stat-card:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   }
 
   .stat-val {
@@ -365,9 +364,11 @@
 
   /* ── CREATE PANEL ── */
   .create-panel {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     background: var(--color-card);
-    border: 3px solid var(--color-border);
-    box-shadow: 6px 6px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     padding: 24px;
     margin-bottom: 28px;
     animation: slideDown 0.2s ease;
@@ -408,8 +409,8 @@
   .step-tag {
     @apply flex items-center gap-1.5 cursor-pointer transition-all;
     background: var(--color-surface);
-    border: 3px solid var(--color-border);
-    box-shadow: 2px 2px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     padding: 6px 12px;
     font-size: 0.8rem;
     font-weight: 700;
@@ -429,12 +430,12 @@
     border: 2px solid var(--color-border);
     font-size: 0.65rem;
     background: #fff;
-    color: #000;
+    color: #fff;
   }
 
   .step-tag.active .step-num {
     background: var(--color-accent3);
-    color: #000;
+    color: #fff;
   }
 
   /* ── TASK CARDS ── */
@@ -443,9 +444,11 @@
   }
 
   .task-card {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     background: var(--color-card);
-    border: 3px solid var(--color-border);
-    box-shadow: 6px 6px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     @apply transition-all;
     padding: 20px 24px;
     animation: fadeIn 0.3s ease;
@@ -465,16 +468,16 @@
 
   .task-card:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 8px 8px 0px var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   }
 
   .task-card.urgent {
-    border-left: 3px solid var(--color-accent2);
+    border-left: 2px solid var(--color-accent2);
     animation: urgentGlow 2s infinite alternate;
   }
 
   .task-card.overdue {
-    border-left: 3px solid var(--color-accent2);
+    border-left: 2px solid var(--color-accent2);
   }
 
   @keyframes urgentGlow {
@@ -492,16 +495,16 @@
   }
 
   .task-card.soon {
-    border-left: 3px solid var(--color-warn);
+    border-left: 2px solid var(--color-warn);
   }
 
   .task-card.ok {
-    border-left: 3px solid var(--color-accent3);
+    border-left: 2px solid var(--color-accent3);
   }
 
   .task-card.done-card {
     @apply opacity-50;
-    border-left: 3px solid var(--color-muted);
+    border-left: 2px solid var(--color-muted);
   }
 
   .task-top {
@@ -605,8 +608,8 @@
     @apply flex items-center justify-center font-bold relative shrink-0 transition-all;
     width: 28px;
     height: 28px;
-    border: 3px solid var(--color-border);
-    box-shadow: 2px 2px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     background: var(--color-surface);
     font-size: 0.75rem;
     font-family: var(--font-mono);
@@ -617,14 +620,14 @@
 
   .step-circle:hover {
     background: var(--color-accent);
-    color: #000;
-    transform: translate(2px, 2px);
-    box-shadow: 0px 0px 0px var(--color-border);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   }
 
   .step-circle.done {
     background: var(--color-accent);
-    color: #000;
+    color: #fff;
   }
 
   .step-label {
@@ -642,7 +645,7 @@
   /* ── PROGRESS BAR ── */
   .progress-bar-wrap {
     background: var(--color-surface);
-    border: 3px solid var(--color-border);
+    border: 1px solid var(--color-border);
     height: 12px;
     margin-bottom: 14px;
     @apply overflow-hidden;
@@ -660,7 +663,7 @@
     @apply flex items-center gap-2.5 flex-wrap;
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 3px solid var(--color-border);
+    border-top: 1px solid var(--color-border);
   }
 
   .cp-label {
@@ -678,15 +681,15 @@
     @apply rounded-full font-bold flex items-center justify-center text-white cursor-pointer transition-transform;
     width: 28px;
     height: 28px;
-    border: 3px solid var(--color-border);
-    box-shadow: 2px 2px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     margin-left: -6px;
     font-size: 0.65rem;
   }
 
   .cp-avatar:hover {
-    transform: translate(2px, 2px);
-    box-shadow: 0px 0px 0px var(--color-border);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     z-index: 10;
   }
 
@@ -754,9 +757,11 @@
   }
 
   .modal {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     background: var(--color-card);
-    border: 3px solid var(--color-border);
-    box-shadow: 8px 8px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     @apply w-full;
     padding: 28px;
     max-width: 480px;
@@ -787,14 +792,14 @@
     bottom: 24px;
     right: 24px;
     background: var(--color-surface);
-    border: 3px solid var(--color-border);
-    box-shadow: 6px 6px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     padding: 12px 20px;
     font-size: 0.95rem;
     font-family: var(--font-heading);
     z-index: 300;
     animation: toastIn 0.3s ease;
-    color: #000;
+    color: #fff;
   }
 
   @keyframes toastIn {
@@ -834,9 +839,11 @@
   }
 
   .auth-card {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     background: var(--color-card);
-    border: 3px solid var(--color-border);
-    box-shadow: 8px 8px 0px var(--color-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     padding: 32px;
   }
 
