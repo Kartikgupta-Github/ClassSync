@@ -6,60 +6,63 @@ const Navbar: React.FC<{ onOpenModal: () => void; onOpenAdmin: () => void; onLog
     const inGroup = state.group || state.mode === 'solo';
 
     return (
-        <nav>
-            <div className="logo">
-                <div className="logo-dot"></div>
-                ClassSync
-            </div>
+        <>
+            {/* Main Nav — always clean and minimal */}
+            <nav>
+                <div className="logo">
+                    <div className="logo-dot"></div>
+                    ClassSync
+                </div>
 
+                {/* Center: group name on desktop only */}
+                {inGroup && (
+                    <div className="nav-center">
+                        {state.mode === 'solo' ? 'Solo Workspace' : state.groupName || ''}
+                    </div>
+                )}
+
+                <div className="nav-right">
+                    {currentAccount && (
+                        <>
+                            <button className="btn btn-ghost btn-sm" onClick={onOpenAdmin} title="Group Settings">⚙</button>
+                            <div
+                                className="nav-avatar"
+                                style={{
+                                    background: state.members[currentAccount.memberIdx]?.color || 'var(--accent)',
+                                }}
+                                title={`${currentAccount.displayName} (${currentAccount.role})`}
+                            >
+                                {currentAccount.displayName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}
+                            </div>
+                            {!state.onboarded ? (
+                                <button className="btn btn-primary" onClick={onOpenModal}>Get Started</button>
+                            ) : (
+                                <button className="btn btn-ghost btn-sm" onClick={onLogout} title="Sign Out">Sign Out</button>
+                            )}
+                        </>
+                    )}
+                </div>
+            </nav>
+
+            {/* Sub-bar: Back + Group Code — only when inside a group */}
             {inGroup && (
-                <div style={{
-                    position: 'absolute',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    fontWeight: 700,
-                    fontSize: '1.2rem',
-                    color: 'var(--text)',
-                    letterSpacing: '0.5px'
-                }}>
-                    {state.mode === 'solo' ? 'Solo Workspace' : state.groupName || 'Loading...'}
+                <div className="sub-bar">
+                    <button className="btn btn-ghost btn-sm" onClick={onLeaveGroup} title="Leave Class">
+                        ← Back
+                    </button>
+
+                    {/* Group name for mobile (hidden on desktop since nav-center handles it) */}
+                    {state.mode !== 'solo' && (
+                        <span className="sub-bar-title">{state.groupName || ''}</span>
+                    )}
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {state.group && <span className="badge">{state.group}</span>}
+                        {state.mode === 'solo' && <span className="badge" style={{ background: 'var(--accent3)', color: '#000' }}>SOLO</span>}
+                    </div>
                 </div>
             )}
-
-            <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {inGroup && (
-                    <>
-                        <button className="btn btn-ghost btn-sm" onClick={onLeaveGroup} title="Leave Class" style={{ marginRight: '8px' }}>
-                            ← Back
-                        </button>
-                        {state.group && <span className="badge">{state.group}</span>}
-                    </>
-                )}
-                {state.mode === 'solo' && <span className="badge" style={{ background: 'var(--accent3)', color: '#000' }}>SOLO</span>}
-
-                {currentAccount && (
-                    <>
-                        <button className="btn btn-ghost btn-sm" onClick={onOpenAdmin} title="Group Settings">⚙</button>
-                        <div
-                            style={{
-                                width: 32, height: 32, borderRadius: '50%',
-                                background: state.members[currentAccount.memberIdx]?.color || 'var(--accent)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '0.75rem', fontWeight: 700, color: '#fff',
-                            }}
-                            title={`${currentAccount.displayName} (${currentAccount.role})`}
-                        >
-                            {currentAccount.displayName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}
-                        </div>
-                        {!state.onboarded ? (
-                            <button className="btn btn-primary" onClick={onOpenModal}>Get Started</button>
-                        ) : (
-                            <button className="btn btn-ghost btn-sm" onClick={onLogout} title="Sign Out">Sign Out</button>
-                        )}
-                    </>
-                )}
-            </div>
-        </nav>
+        </>
     );
 };
 

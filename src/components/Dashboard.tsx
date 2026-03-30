@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { initials, STEP_PRESETS, SUBJECT_SUGGESTIONS } from '../types';
+import { STEP_PRESETS, SUBJECT_SUGGESTIONS } from '../types';
 import { getDeadlineInfo, isAllDone, exportToPDF } from '../utils/helpers';
 import { showToast } from './Toast';
 
@@ -177,23 +177,27 @@ const Dashboard: React.FC = () => {
             )}
 
             {state.mode === 'group' && (
-                <div className="user-bar">
-                    <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontFamily: '"DM Mono", monospace' }}>MEMBERS:</span>
-                    {state.members.map((m, i) => {
-                        const isMe = i === state.currentUser;
-                        return (
-                            <div key={i} className={`user-pill ${isMe ? 'active' : ''}`} style={{ cursor: 'default' }}>
-                                <div className="avatar" style={{ background: m.color }}>
-                                    {initials(m.name)}
-                                </div>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    {m.name}
-                                    {isMe && <span style={{ fontSize: '0.65rem', color: 'var(--accent)', fontWeight: 700 }}>(You)</span>}
-                                    {i === 0 && <span style={{ fontSize: '0.6rem' }} title="Admin">👑</span>}
-                                </span>
+                <div className="member-summary">
+                    <div className="avatar-stack">
+                        {state.members.slice(0, 5).map((m, i) => (
+                            <div
+                                key={i}
+                                className="avatar-stack-item"
+                                style={{ background: m.color, zIndex: 5 - i }}
+                                title={m.name}
+                            >
+                                {m.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}
                             </div>
-                        );
-                    })}
+                        ))}
+                        {state.members.length > 5 && (
+                            <div className="avatar-stack-item avatar-stack-more" style={{ zIndex: 0 }}>
+                                +{state.members.length - 5}
+                            </div>
+                        )}
+                    </div>
+                    <span className="member-count">
+                        {state.members.length} {state.members.length === 1 ? 'member' : 'members'}
+                    </span>
                 </div>
             )}
 

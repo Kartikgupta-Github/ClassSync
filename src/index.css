@@ -58,7 +58,8 @@
   /* ── NAV ── */
   nav {
     @apply flex items-center justify-between sticky top-0 z-50;
-    padding: 18px 32px;
+    position: relative;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--color-border);
     background: rgba(10, 10, 15, 0.92);
     backdrop-filter: blur(12px);
@@ -92,7 +93,111 @@
   }
 
   .nav-right {
-    @apply flex items-center gap-3;
+    @apply flex items-center gap-2;
+  }
+
+  .nav-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-text);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    max-width: 40%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  /* ── SUB-BAR (Back + Group Code) ── */
+  .sub-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    background: rgba(10, 10, 15, 0.8);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 55px;
+    z-index: 49;
+    backdrop-filter: blur(8px);
+  }
+
+  .sub-bar-title {
+    display: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 40%;
+  }
+
+  /* ── MEMBER SUMMARY (compact avatar stack) ── */
+  .member-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+  }
+
+  .avatar-stack {
+    display: flex;
+    align-items: center;
+  }
+
+  .avatar-stack-item {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fff;
+    border: 2px solid var(--color-bg);
+    margin-left: -10px;
+    position: relative;
+    transition: transform 0.2s;
+  }
+
+  .avatar-stack-item:first-child {
+    margin-left: 0;
+  }
+
+  .avatar-stack-item:hover {
+    transform: scale(1.15);
+    z-index: 10 !important;
+  }
+
+  .avatar-stack-more {
+    background: var(--color-surface);
+    color: var(--color-muted);
+    font-size: 0.7rem;
+    border-color: var(--color-border);
+  }
+
+  .member-count {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-weight: 600;
   }
 
   .badge {
@@ -1056,5 +1161,122 @@
     height: 48px;
     min-width: 40px;
     font-size: 1.2rem;
+  }
+
+  /* ── MOBILE RESPONSIVE ── */
+
+  @media (max-width: 768px) {
+    nav {
+      padding: 12px 16px;
+    }
+
+    .nav-center {
+      display: none;
+    }
+
+    .sub-bar {
+      padding: 8px 16px;
+      top: 49px;
+    }
+
+    .sub-bar-title {
+      display: block;
+    }
+
+    .logo {
+      font-size: 1rem;
+    }
+
+    .container {
+      padding: 20px 16px;
+    }
+
+    .stats-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .tab-bar {
+      flex-direction: row;
+    }
+
+    .tab-bar .btn {
+      flex: 1;
+      font-size: 0.8rem;
+      padding: 8px 12px;
+    }
+
+    .member-summary {
+      padding: 8px 0;
+    }
+
+    .avatar-stack-item {
+      width: 30px;
+      height: 30px;
+      font-size: 0.6rem;
+      margin-left: -8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    nav {
+      padding: 10px 12px;
+    }
+
+    .sub-bar {
+      padding: 6px 12px;
+      top: 44px;
+    }
+
+    .sub-bar-title {
+      font-size: 0.85rem;
+      max-width: 35%;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      font-size: 0.78rem;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.72rem;
+    }
+
+    .stats-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .stat-card {
+      padding: 12px;
+    }
+
+    .stat-val {
+      font-size: 1.4rem;
+    }
+
+    .container {
+      padding: 16px 12px;
+    }
+
+    .nav-avatar {
+      width: 28px;
+      height: 28px;
+      font-size: 0.65rem;
+    }
   }
 }
