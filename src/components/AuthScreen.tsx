@@ -185,7 +185,7 @@ const AuthScreen: React.FC = () => {
         <div className="auth-container">
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <div className="logo-dot" />
+                    <img src="/logo.png" alt="Assignova Logo" style={{ width: '40px', height: '40px', borderRadius: '8px' }} />
                     <span style={{ fontSize: '1.5rem', fontWeight: 800 }}>Assignova</span>
                 </div>
             </div>

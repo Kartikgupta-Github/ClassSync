@@ -10,7 +10,7 @@ const Navbar: React.FC<{ onOpenModal: () => void; onOpenAdmin: () => void; onLog
             {/* Main Nav — always clean and minimal */}
             <nav>
                 <div className="logo">
-                    <div className="logo-dot"></div>
+                    <img src="/logo.png" alt="Assignova Logo" style={{ width: '26px', height: '26px', borderRadius: '6px' }} />
                     Assignova
                 </div>
 

@@ -146,7 +146,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
                 {/* ═══ CHOOSE MODE ═══ */}
                 {step === 'choose' && (
                     <>
-                        <h2 style={{ textAlign: 'center', marginBottom: '8px' }}>🎓 Get Started with Assignova</h2>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+                            <img src="/logo.png" alt="Assignova Logo" style={{ width: '56px', height: '56px', borderRadius: '12px' }} />
+                        </div>
+                        <h2 style={{ textAlign: 'center', marginBottom: '8px' }}>Get Started with Assignova</h2>
                         <p style={{ textAlign: 'center', color: 'var(--muted)', fontFamily: '"DM Mono", monospace', fontSize: '0.82rem', marginBottom: '24px' }}>
                             Choose how you want to track your assignments
                         </p>
