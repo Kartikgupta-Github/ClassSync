@@ -27,6 +27,7 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
     // Permission checks
     const canToggleSteps = isOwnIdx(state.currentUser!) ? hasPermission('toggle_own_steps') : hasPermission('toggle_others_steps');
     const canDelete = hasPermission('delete_task');
+    const canEdit = hasPermission('edit_task');
     const canComment = hasPermission('add_comment');
     const canUpload = hasPermission('upload_proof');
 
@@ -111,7 +112,7 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
                         <button className="btn btn-ghost btn-sm" onClick={() => setShowComments(!showComments)} title="Comments">
                             💬
                         </button>
-                        {canDelete && onEdit && (
+                        {canEdit && onEdit && (
                             <button className="btn btn-ghost btn-sm" onClick={onEdit}>✏️ Edit</button>
                         )}
                         {canDelete && (
