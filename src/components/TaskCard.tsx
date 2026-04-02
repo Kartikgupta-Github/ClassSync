@@ -5,7 +5,7 @@ import type { Task } from '../types';
 import { getDeadlineInfo, isAllDone, isNudgeNeeded } from '../utils/helpers';
 import { showToast } from './Toast';
 
-const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
+const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit }) => {
     const { state, dispatch, hasPermission, isOwnIdx } = useApp();
     const [showComments, setShowComments] = useState(false);
     const [commentText, setCommentText] = useState('');
@@ -111,8 +111,11 @@ const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
                         <button className="btn btn-ghost btn-sm" onClick={() => setShowComments(!showComments)} title="Comments">
                             💬
                         </button>
+                        {canDelete && onEdit && (
+                            <button className="btn btn-ghost btn-sm" onClick={onEdit}>✏️ Edit</button>
+                        )}
                         {canDelete && (
-                            <button className="btn btn-danger" onClick={handleDelete}>Remove</button>
+                            <button className="btn btn-danger btn-sm" onClick={handleDelete}>Remove</button>
                         )}
                     </div>
                 </div>

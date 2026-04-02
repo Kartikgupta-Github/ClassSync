@@ -19,6 +19,7 @@ type Action =
     // Tasks
     | { type: 'ADD_TASK'; task: Task }
     | { type: 'DELETE_TASK'; taskId: number }
+    | { type: 'EDIT_TASK'; taskId: number; updates: Partial<Task> }
     | { type: 'TOGGLE_STEP'; taskId: number; stepIdx: number }
     | { type: 'ADD_COMMENT'; taskId: number; text: string }
     | { type: 'SET_PROOF'; taskId: number; url: string }
@@ -169,6 +170,33 @@ function reducer(state: AppState, action: Action): AppState {
 
         case 'DELETE_TASK':
             return { ...state, tasks: state.tasks.filter(t => t.id !== action.taskId) };
+
+        case 'EDIT_TASK': {
+            return {
+                ...state,
+                tasks: state.tasks.map(t => {
+                    if (t.id !== action.taskId) return t;
+                    const updatedTask = { ...t, ...action.updates };
+                    
+                    // Handle memberProgress resizing if steps length changed
+                    if (action.updates.steps && action.updates.steps.length !== t.steps.length) {
+                        const newProgress: Record<number, boolean[]> = {};
+                        const oldProgress = t.memberProgress || {};
+                        const newLen = action.updates.steps.length;
+                        
+                        Object.keys(oldProgress).forEach(memberIdx => {
+                            const idx: number = Number(memberIdx);
+                            let arr = oldProgress[idx] || [];
+                            if (arr.length > newLen) arr = arr.slice(0, newLen);
+                            else while (arr.length < newLen) arr.push(false);
+                            newProgress[idx] = arr;
+                        });
+                        updatedTask.memberProgress = newProgress;
+                    }
+                    return updatedTask;
+                })
+            };
+        }
 
         case 'TOGGLE_STEP': {
             const u = state.currentUser;

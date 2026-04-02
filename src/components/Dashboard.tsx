@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { STEP_PRESETS, SUBJECT_SUGGESTIONS } from '../types';
+import type { Task } from '../types';
 import { getDeadlineInfo, isAllDone, exportToPDF } from '../utils/helpers';
 import { showToast } from './Toast';
 
@@ -9,15 +10,25 @@ import Leaderboard from './Leaderboard';
 
 type Tab = 'tasks' | 'leaderboard';
 
-const CreatePanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+const CreatePanel: React.FC<{ onClose: () => void, editTask?: Task | null }> = ({ onClose, editTask }) => {
     const { state, dispatch, hasPermission } = useApp();
-    const [name, setName] = useState('');
-    const [subject, setSubject] = useState('');
-    const [deadline, setDeadline] = useState('');
-    const [type, setType] = useState('Assignment');
-    const [activeSteps, setActiveSteps] = useState(['Write', 'Get Checked', 'Submit Portal']);
+    const [name, setName] = useState(editTask?.name || '');
+    const [subject, setSubject] = useState(editTask?.subject || '');
+    const [deadline, setDeadline] = useState(editTask?.deadline || '');
+    const [type, setType] = useState(editTask?.type || 'Assignment');
+    const [activeSteps, setActiveSteps] = useState(editTask?.steps || ['Write', 'Get Checked', 'Submit Portal']);
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [uploading, setUploading] = useState(false);
+
+    useEffect(() => {
+        if (editTask) {
+            setName(editTask.name);
+            setSubject(editTask.subject);
+            setDeadline(editTask.deadline);
+            setType(editTask.type);
+            setActiveSteps(editTask.steps);
+        }
+    }, [editTask]);
 
     if (!hasPermission('create_task')) {
         return (
@@ -49,37 +60,45 @@ const CreatePanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         }
     }, [subject]);
 
-    const handleCreate = async () => {
+    const handleSubmit = async () => {
         if (!name || !deadline) { showToast('⚠ Task name and deadline required'); return; }
         if (!activeSteps.length) { showToast('⚠ Select at least one step'); return; }
 
         setUploading(true);
         try {
-            dispatch({
-                type: 'ADD_TASK',
-                task: {
-                    id: Date.now(),
-                    name,
-                    subject,
-                    deadline,
-                    type,
-                    steps: activeSteps,
-                    memberProgress: {},
-                    createdBy: state.currentUser!,
-                    createdAt: Date.now(),
-                    comments: [],
-                    attachments: []
-                },
-            });
-
-            showToast(`✓ "${name}" added for all ${state.members.length} member(s)`);
+            if (editTask) {
+                dispatch({
+                    type: 'EDIT_TASK',
+                    taskId: editTask.id,
+                    updates: { name, subject, deadline, type, steps: activeSteps }
+                });
+                showToast(`✓ "${name}" updated`);
+            } else {
+                dispatch({
+                    type: 'ADD_TASK',
+                    task: {
+                        id: Date.now(),
+                        name,
+                        subject,
+                        deadline,
+                        type,
+                        steps: activeSteps,
+                        memberProgress: {},
+                        createdBy: state.currentUser!,
+                        createdAt: Date.now(),
+                        comments: [],
+                        attachments: []
+                    },
+                });
+                showToast(`✓ "${name}" added for all ${state.members.length} member(s)`);
+            }
             setName('');
             setSubject('');
             setDeadline('');
             onClose();
         } catch (err) {
-            console.error('Create task error:', err);
-            showToast('❌ Failed to create task');
+            console.error('Submit task error:', err);
+            showToast('❌ Failed to save task');
         } finally {
             setUploading(false);
         }
@@ -132,8 +151,8 @@ const CreatePanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '16px' }}>
                 <button className="btn btn-ghost" onClick={onClose} disabled={uploading}>Cancel</button>
-                <button className="btn btn-primary" onClick={handleCreate} disabled={uploading}>
-                    {state.mode === 'group' ? 'Create for Everyone →' : 'Create Task →'}
+                <button className="btn btn-primary" onClick={handleSubmit} disabled={uploading}>
+                    {editTask ? 'Update Task →' : (state.mode === 'group' ? 'Create for Everyone →' : 'Create Task →')}
                 </button>
             </div>
         </div>
@@ -143,8 +162,17 @@ const CreatePanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 const Dashboard: React.FC = () => {
     const { state, hasPermission } = useApp();
     const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
+    const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [activeTab, setActiveTab] = useState<Tab>('tasks');
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+    const openCreate = () => { setEditingTask(null); setIsCreatePanelOpen(true); };
+    const closePanel = () => { setIsCreatePanelOpen(false); setEditingTask(null); };
+    const openEdit = (task: Task) => {
+        setEditingTask(task);
+        setIsCreatePanelOpen(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     useEffect(() => {
         const goOffline = () => setIsOffline(true);
@@ -228,12 +256,12 @@ const Dashboard: React.FC = () => {
                                 <button className="btn btn-ghost" onClick={() => exportToPDF(state)}>📄 Export PDF</button>
                             )}
                             {hasPermission('create_task') && (
-                                <button className="btn btn-primary" onClick={() => setIsCreatePanelOpen(!isCreatePanelOpen)}>+ New Task</button>
+                                <button className="btn btn-primary" onClick={openCreate}>+ New Task</button>
                             )}
                         </div>
                     </div>
 
-                    {isCreatePanelOpen && <CreatePanel onClose={() => setIsCreatePanelOpen(false)} />}
+                    {isCreatePanelOpen && <CreatePanel onClose={closePanel} editTask={editingTask} />}
 
                     <div className="tasks-grid">
                         {sortedTasks.length === 0 ? (
@@ -245,7 +273,7 @@ const Dashboard: React.FC = () => {
                                 </div>
                             </div>
                         ) : (
-                            sortedTasks.map(t => <TaskCard key={t.id} task={t} />)
+                            sortedTasks.map(t => <TaskCard key={t.id} task={t} onEdit={() => openEdit(t)} />)
                         )}
                     </div>
                 </>
