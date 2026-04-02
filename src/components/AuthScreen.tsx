@@ -246,7 +246,7 @@ const AuthScreen: React.FC = () => {
 
                         <div className="form-group">
                             <label>Display Name</label>
-                            <input type="text" placeholder="e.g. Kartik Gupta" value={displayName} onChange={e => setDisplayName(e.target.value)} />
+                            <input type="text" placeholder="e.g. John Doe" value={displayName} onChange={e => setDisplayName(e.target.value)} />
                             {errors.displayName && <div className="form-error">{errors.displayName}</div>}
                         </div>
                         <div className="form-group">
