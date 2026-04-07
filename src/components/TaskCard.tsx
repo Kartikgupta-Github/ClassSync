@@ -5,6 +5,18 @@ import type { Task } from '../types';
 import { getDeadlineInfo, isAllDone, isNudgeNeeded } from '../utils/helpers';
 import { showToast } from './Toast';
 
+const getStepIcon = (step: string) => {
+    const s = step.toLowerCase();
+    if (s.includes('write') || s.includes('draft') || s.includes('type')) return '✍️';
+    if (s.includes('check') || s.includes('review') || s.includes('verify')) return '👀';
+    if (s.includes('submit') || s.includes('portal') || s.includes('upload')) return '📤';
+    if (s.includes('read') || s.includes('study')) return '📖';
+    if (s.includes('print')) return '🖨️';
+    if (s.includes('code') || s.includes('program')) return '💻';
+    if (s.includes('present') || s.includes('viva')) return '🎤';
+    return '📌';
+};
+
 const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit }) => {
     const { state, dispatch, hasPermission, isOwnIdx } = useApp();
     const [showComments, setShowComments] = useState(false);
@@ -164,12 +176,12 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
                         <div 
                             style={{ display: 'flex', alignItems: 'center', cursor: canToggleSteps ? 'pointer' : 'not-allowed', zIndex: 2 }}
                             onClick={() => handleToggleStep(i)}
-                            title={canToggleSteps ? s : `⛔ Can't modify ${isOwnIdx(state.currentUser!) ? '' : "others'"} steps`}
+                            title={canToggleSteps ? s : `⛔ Can't modify ${isOwnIdx(state.currentUser!) ? '' : "others'"} steps: ${s}`}
                         >
                             <div className={`step-circle ${up[i] ? 'done' : ''}`}>
                                 {up[i] ? '✓' : i + 1}
                             </div>
-                            <span className="step-label">{s}</span>
+                            <span className="step-label" style={{ fontSize: '1.2rem', paddingLeft: '4px' }}>{getStepIcon(s)}</span>
                         </div>
                     </div>
                 ))}
