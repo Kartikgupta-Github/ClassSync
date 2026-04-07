@@ -5,16 +5,26 @@ import type { Task } from '../types';
 import { getDeadlineInfo, isAllDone, isNudgeNeeded } from '../utils/helpers';
 import { showToast } from './Toast';
 
+import { Pencil, ClipboardCheck, UploadCloud, Printer, Inbox, MapPin } from 'lucide-react';
+
 const getStepIcon = (step: string) => {
     const s = step.toLowerCase();
-    if (s.includes('write') || s.includes('draft') || s.includes('type')) return '✍️';
-    if (s.includes('check') || s.includes('review') || s.includes('verify')) return '👀';
-    if (s.includes('submit') || s.includes('portal') || s.includes('upload')) return '📤';
-    if (s.includes('read') || s.includes('study')) return '📖';
-    if (s.includes('print')) return '🖨️';
-    if (s.includes('code') || s.includes('program')) return '💻';
-    if (s.includes('present') || s.includes('viva')) return '🎤';
-    return '📌';
+    if (s.includes('write')) return <Pencil size={18} />;
+    if (s.includes('check')) return <ClipboardCheck size={18} />;
+    if (s.includes('submit portal')) return <UploadCloud size={18} />;
+    if (s.includes('print')) return <Printer size={18} />;
+    if (s.includes('physical')) return <Inbox size={18} />;
+    return <MapPin size={18} />;
+};
+
+const getSubjectColor = (subj: string) => {
+    const s = subj.toLowerCase();
+    if (s.includes('dbms') || s.includes('math')) return 'orange';
+    if (s.includes('os') || s.includes('ml')) return 'blue';
+    if (s.includes('cn')) return 'purple';
+    if (s.includes('daa') || s.includes('ai')) return 'pink';
+    if (s.includes('se')) return 'green';
+    return 'blue';
 };
 
 const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit }) => {
@@ -27,7 +37,6 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
     const cc = done ? 'done-card' : dl.cls;
     const up = task.memberProgress[state.currentUser!] || new Array(task.steps.length).fill(false);
     const completedSteps = up.filter(Boolean).length;
-    const pct = task.steps.length ? Math.round((completedSteps / task.steps.length) * 100) : 0;
 
     const doneCount = state.members.filter((_, mi) => {
         const mp = task.memberProgress[mi] || [];
@@ -76,21 +85,14 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
             return;
         }
 
-        // Logic check: cannot click step > 0 if step 0 is not done
-        if (stepIdx > 0 && !up[0]) {
-            showToast(`⚠ Complete "${task.steps[0]}" first before moving on.`);
-            return;
+        // Sequential tracking mechanism
+        let targetIdx = stepIdx;
+        // Allows unchecking everything if clicking step 0 again
+        if (stepIdx === 0 && up[0] && !up[1]) {
+            targetIdx = -1;
         }
 
-        // Logic check: cannot uncheck step 0 if later steps are checked
-        if (stepIdx === 0 && up[0]) {
-            if (up.slice(1).some(Boolean)) {
-                showToast(`⚠ Uncheck later steps before unmarking "${task.steps[0]}".`);
-                return;
-            }
-        }
-
-        dispatch({ type: 'TOGGLE_STEP', taskId: task.id, stepIdx });
+        dispatch({ type: 'SET_STEP_PROGRESS', taskId: task.id, targetIdx });
     };
 
     const handleDelete = () => {
@@ -102,17 +104,22 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
     return (
         <div className={`task-card ${cc}`}>
             <div className="task-top">
-                <div className="task-title-row">
-                    <div className="task-subject">{task.type} · {task.subject || 'General'}</div>
-                    <div className="task-name">{task.name}</div>
-                    <div className="task-meta">
-                        <span className="meta-chip">📅 {new Date(task.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-                        <span className="meta-chip">by {creator}</span>
-                        {(task.comments?.length || 0) > 0 && (
-                            <span className="meta-chip" style={{ cursor: 'pointer' }} onClick={() => setShowComments(!showComments)}>
-                                💬 {task.comments.length}
-                            </span>
-                        )}
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                    <div className="icon-3d-wrapper" title={task.subject}>
+                        <div className={`icon-3d-file ${getSubjectColor(task.subject || '')}`}></div>
+                    </div>
+                    <div className="task-title-row">
+                        <div className="task-subject">{task.type} {task.subject && `· ${task.subject}`}</div>
+                        <div className="task-name">{task.name}</div>
+                        <div className="task-meta">
+                            <span className="meta-chip">📅 {new Date(task.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                            <span className="meta-chip">by {creator}</span>
+                            {(task.comments?.length || 0) > 0 && (
+                                <span className="meta-chip" style={{ cursor: 'pointer' }} onClick={() => setShowComments(!showComments)}>
+                                    💬 {task.comments.length}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
@@ -167,21 +174,21 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
                 </div>
             )}
 
-            <div className="progress-bar-wrap">
-                <div className="progress-bar-fill" style={{ width: `${pct}%` }}></div>
-            </div>
-            <div className="steps-progress">
+            <div className="tracker-container">
+                <div className="tracker-bg-line"></div>
+                <div className="tracker-fill-line" style={{ width: task.steps.length > 1 ? `${(Math.max(0, completedSteps - 1) / (task.steps.length - 1)) * 100}%` : `${completedSteps > 0 ? 100 : 0}%` }}></div>
+                
                 {task.steps.map((s, i) => (
-                    <div key={i} className={`progress-step ${up[i] ? 'completed' : ''}`}>
+                    <div key={i} className="tracker-node-wrapper" style={{ flex: 1, alignItems: i === 0 ? 'flex-start' : i === task.steps.length - 1 ? 'flex-end' : 'center' }}>
                         <div 
-                            style={{ display: 'flex', alignItems: 'center', cursor: canToggleSteps ? 'pointer' : 'not-allowed', zIndex: 2 }}
+                            className={`tracker-node ${up[i] ? 'completed' : ''}`}
                             onClick={() => handleToggleStep(i)}
                             title={canToggleSteps ? s : `⛔ Can't modify ${isOwnIdx(state.currentUser!) ? '' : "others'"} steps: ${s}`}
                         >
-                            <div className={`step-circle ${up[i] ? 'done' : ''}`}>
-                                {up[i] ? '✓' : i + 1}
-                            </div>
-                            <span className="step-label" style={{ fontSize: '1.2rem', paddingLeft: '4px' }}>{getStepIcon(s)}</span>
+                            {getStepIcon(s)}
+                        </div>
+                        <div className="tracker-label" style={{ left: i === 0 ? '-10px' : i === task.steps.length - 1 ? 'auto' : '50%', right: i === task.steps.length - 1 ? '-10px' : 'auto', transform: (i !== 0 && i !== task.steps.length - 1) ? 'translateX(-50%)' : 'none' }}>
+                            {s}
                         </div>
                     </div>
                 ))}

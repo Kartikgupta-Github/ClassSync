@@ -5,11 +5,11 @@
    Tailwind v4 Theme — ClassSync Custom Tokens
    ══════════════════════════════════════════════ */
 @theme {
-  --color-bg: #0f172a;
-  --color-surface: rgba(30, 41, 59, 0.4);
-  --color-card: rgba(30, 41, 59, 0.6);
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-accent: #38bdf8;
+  --color-bg: #0B1121;
+  --color-surface: rgba(21, 28, 44, 0.7);
+  --color-card: #151C2C;
+  --color-border: #2A344A;
+  --color-accent: #00E5FF;
   --color-accent2: #c084fc;
   --color-accent3: #f472b6;
   --color-text: #f8fafc;
@@ -31,9 +31,10 @@
   }
 
   body {
-    @apply bg-bg text-text antialiased;
+    @apply text-text antialiased;
+    background-color: var(--color-bg);
     font-family: 'Syne', sans-serif;
-    min-height: 100vh; overflow-x: hidden; background: radial-gradient(circle at -20% 0%, rgba(192, 132, 252, 0.15), transparent 40vw), radial-gradient(circle at 120% 100%, rgba(56, 189, 248, 0.1), transparent 40vw), var(--color-bg);
+    min-height: 100vh; overflow-x: hidden;
   }
 }
 
@@ -465,11 +466,11 @@
   }
 
   .task-card {
+    background: linear-gradient(to bottom, #1A2235, #111827);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    background: var(--color-card);
-    border: 1px solid var(--color-border);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     @apply transition-all;
     padding: 20px 24px;
     animation: fadeIn 0.3s ease;
@@ -1225,6 +1226,163 @@
     height: 48px;
     min-width: 40px;
     font-size: 1.2rem;
+  }
+
+  /* ── 3D FOLDER ICONS (CLAYMORPHISM) ── */
+  .icon-3d-wrapper {
+    perspective: 600px;
+    width: 32px;
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .icon-3d-file {
+    width: 24px;
+    height: 30px;
+    border-radius: 4px;
+    transform: rotateY(-18deg) rotateX(15deg) rotateZ(8deg);
+    position: relative;
+    transform-style: preserve-3d;
+    box-shadow: -1px 1px 0 rgba(0,0,0,0.3), -2px 2px 0 rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+
+  .icon-3d-file::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 10px; height: 10px;
+    background: currentColor;
+    border-bottom-left-radius: 4px;
+    box-shadow: -1px 1px 2px rgba(0,0,0,0.4);
+    transform: translateZ(1px);
+    opacity: 0.8;
+  }
+
+  .icon-3d-file.blue {
+    background: linear-gradient(135deg, #00E5FF, #3b82f6);
+    color: #3b82f6;
+    box-shadow: -1px 1px 0 #1d4ed8, -2px 2px 0 #1e3a8a, -3px 3px 0 #0f172a, inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+
+  .icon-3d-file.pink {
+    background: linear-gradient(135deg, #f472b6, #db2777);
+    color: #db2777;
+    box-shadow: -1px 1px 0 #be185d, -2px 2px 0 #831843, -3px 3px 0 #0f172a, inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+
+  .icon-3d-file.orange {
+    background: linear-gradient(135deg, #fb923c, #ea580c);
+    color: #ea580c;
+    box-shadow: -1px 1px 0 #c2410c, -2px 2px 0 #7c2d12, -3px 3px 0 #0f172a, inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+
+  .icon-3d-file.green {
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    color: #16a34a;
+    box-shadow: -1px 1px 0 #15803d, -2px 2px 0 #14532d, -3px 3px 0 #0f172a, inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+
+  .icon-3d-file.purple {
+    background: linear-gradient(135deg, #a855f7, #7e22ce);
+    color: #7e22ce;
+    box-shadow: -1px 1px 0 #6b21a8, -2px 2px 0 #581c87, -3px 3px 0 #0f172a, inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+
+  /* ── 3D PROGRESS TRACKER ── */
+  .tracker-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    margin: 24px 10px 32px 10px;
+    height: 40px;
+  }
+
+  .tracker-bg-line {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 4px;
+    background: #1E293B;
+    transform: translateY(-50%);
+    border-radius: 4px;
+    z-index: 1;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  .tracker-fill-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    background: var(--color-accent);
+    transform: translateY(-50%);
+    border-radius: 4px;
+    z-index: 2;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px var(--color-accent);
+  }
+
+  .tracker-node-wrapper {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tracker-node {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #475569, #1e293b);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4), 0 4px 6px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+    color: var(--color-text);
+  }
+
+  .tracker-node:hover {
+    transform: scale(1.1);
+  }
+
+  .tracker-node.completed {
+    background: radial-gradient(circle at 30% 30%, #a5f3fc, #06b6d4);
+    box-shadow: inset -2px -2px 6px rgba(0,0,0,0.2), 0 0 15px rgba(6, 182, 212, 0.6);
+    color: #0f172a;
+  }
+
+  .tracker-node.completed svg {
+    transform: scale(1.2) translateZ(8px);
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+    transition: all 0.3s ease;
+  }
+
+  .tracker-label {
+    position: absolute;
+    top: 40px;
+    font-size: 0.60rem;
+    font-family: var(--font-mono);
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    width: 64px;
+    transition: color 0.3s ease;
+  }
+
+  .tracker-node.completed + .tracker-label {
+    color: var(--color-accent);
+    font-weight: 600;
   }
 
   /* ── MOBILE RESPONSIVE ── */
