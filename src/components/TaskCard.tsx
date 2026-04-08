@@ -85,14 +85,23 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
             return;
         }
 
-        // Sequential tracking mechanism
-        let targetIdx = stepIdx;
-        // Allows unchecking everything if clicking step 0 again
-        if (stepIdx === 0 && up[0] && !up[1]) {
-            targetIdx = -1;
+        const isChecking = !up[stepIdx];
+
+        if (isChecking) {
+            // Cannot check if the previous step is still incomplete
+            if (stepIdx > 0 && !up[stepIdx - 1]) {
+                showToast(`⚠ Complete "${task.steps[stepIdx - 1]}" first.`);
+                return;
+            }
+        } else {
+            // Cannot uncheck if the next step is already completed
+            if (stepIdx < task.steps.length - 1 && up[stepIdx + 1]) {
+                showToast(`⚠ Uncheck "${task.steps[stepIdx + 1]}" first.`);
+                return;
+            }
         }
 
-        dispatch({ type: 'SET_STEP_PROGRESS', taskId: task.id, targetIdx });
+        dispatch({ type: 'TOGGLE_STEP', taskId: task.id, stepIdx });
     };
 
     const handleDelete = () => {
@@ -103,8 +112,8 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
 
     return (
         <div className={`task-card ${cc}`}>
-            <div className="task-top">
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+            <div className="task-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flex: 1, minWidth: 0 }}>
                     <div className="icon-3d-wrapper" title={task.subject}>
                         <div className={`icon-3d-file ${getSubjectColor(task.subject || '')}`}></div>
                     </div>
@@ -122,22 +131,8 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
                         </div>
                     </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                <div style={{ flexShrink: 0 }}>
                     <div className={`deadline-chip ${done ? 'done' : dl.cls}`}>{done ? '✓ Done' : dl.label}</div>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                        <button className="btn btn-ghost btn-sm" onClick={handleProofUpload} title={canUpload ? 'Attach proof' : 'No permission'} disabled={!canUpload}>
-                            📎
-                        </button>
-                        <button className="btn btn-ghost btn-sm" onClick={() => setShowComments(!showComments)} title="Comments">
-                            💬
-                        </button>
-                        {canEdit && onEdit && (
-                            <button className="btn btn-ghost btn-sm" onClick={onEdit}>✏️ Edit</button>
-                        )}
-                        {canDelete && (
-                            <button className="btn btn-danger btn-sm" onClick={handleDelete}>Remove</button>
-                        )}
-                    </div>
                 </div>
             </div>
 
@@ -217,6 +212,26 @@ const TaskCard: React.FC<{ task: Task; onEdit?: () => void }> = ({ task, onEdit 
                     <span className="cp-label" style={{ marginLeft: '4px' }}>{doneCount}/{state.members.length} done</span>
                 </div>
             )}
+
+            {/* Action Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--border)', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {canEdit && onEdit && (
+                        <button className="btn btn-ghost btn-sm" onClick={onEdit}>✏️ Edit</button>
+                    )}
+                    {canDelete && (
+                        <button className="btn btn-danger btn-sm" onClick={handleDelete}>Remove</button>
+                    )}
+                </div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button className="btn btn-ghost btn-sm" onClick={handleProofUpload} title={canUpload ? 'Attach proof' : 'No permission'} disabled={!canUpload}>
+                        📎 Attach Proof
+                    </button>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setShowComments(!showComments)} title="Comments">
+                        💬 Comments
+                    </button>
+                </div>
+            </div>
 
             {/* Comments Section */}
             {showComments && (

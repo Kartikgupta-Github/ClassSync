@@ -20,7 +20,7 @@ type Action =
     | { type: 'ADD_TASK'; task: Task }
     | { type: 'DELETE_TASK'; taskId: number }
     | { type: 'EDIT_TASK'; taskId: number; updates: Partial<Task> }
-    | { type: 'SET_STEP_PROGRESS'; taskId: number; targetIdx: number }
+    | { type: 'TOGGLE_STEP'; taskId: number; stepIdx: number }
     | { type: 'ADD_COMMENT'; taskId: number; text: string }
     | { type: 'SET_PROOF'; taskId: number; url: string }
     // Profile
@@ -198,7 +198,7 @@ function reducer(state: AppState, action: Action): AppState {
             };
         }
 
-        case 'SET_STEP_PROGRESS': {
+        case 'TOGGLE_STEP': {
             const u = state.currentUser;
             if (u === null) return state;
             return {
@@ -206,15 +206,9 @@ function reducer(state: AppState, action: Action): AppState {
                 tasks: state.tasks.map(t => {
                     if (t.id !== action.taskId) return t;
                     const newProgress = { ...t.memberProgress };
-                    
-                    // Create a new array matching the steps length
-                    const arr = new Array(t.steps.length).fill(false);
-                    // Mark up to and including the targetIdx as complete
-                    for (let i = 0; i <= action.targetIdx; i++) {
-                        arr[i] = true;
-                    }
-                    
-                    newProgress[u] = arr;
+                    if (!newProgress[u]) newProgress[u] = new Array(t.steps.length).fill(false);
+                    newProgress[u] = [...newProgress[u]];
+                    newProgress[u][action.stepIdx] = !newProgress[u][action.stepIdx];
                     return { ...t, memberProgress: newProgress };
                 }),
             };

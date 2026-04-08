@@ -1227,8 +1227,9 @@
     min-width: 40px;
     font-size: 1.2rem;
   }
+}
 
-  /* ── 3D FOLDER ICONS (CLAYMORPHISM) ── */
+/* ── 3D FOLDER ICONS (CLAYMORPHISM) ── */
   .icon-3d-wrapper {
     perspective: 600px;
     width: 32px;
@@ -1500,5 +1501,4 @@
       height: 28px;
       font-size: 0.65rem;
     }
-  }
 }

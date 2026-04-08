@@ -165,6 +165,10 @@ const Dashboard: React.FC = () => {
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [activeTab, setActiveTab] = useState<Tab>('tasks');
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
+    
+    // Track visual done status to delay the sorting
+    const [visualDone, setVisualDone] = useState<Record<number, boolean>>({});
+    const timersRef = React.useRef<Record<number, ReturnType<typeof setTimeout>>>({});
 
     const openCreate = () => { setEditingTask(null); setIsCreatePanelOpen(true); };
     const closePanel = () => { setIsCreatePanelOpen(false); setEditingTask(null); };
@@ -182,6 +186,45 @@ const Dashboard: React.FC = () => {
         return () => { window.removeEventListener('offline', goOffline); window.removeEventListener('online', goOnline); };
     }, []);
 
+    useEffect(() => {
+        const nextVisualDone = { ...visualDone };
+        let needsInstantUpdate = false;
+
+        // On mount, instantly mark actually done tasks as visually done
+        if (Object.keys(visualDone).length === 0 && state.tasks.length > 0) {
+            state.tasks.forEach(t => {
+                if (isAllDone(t, state.currentUser)) {
+                    nextVisualDone[t.id] = true;
+                    needsInstantUpdate = true;
+                }
+            });
+        } else {
+            // Check for changes
+            state.tasks.forEach(t => {
+                const done = isAllDone(t, state.currentUser);
+                const vDone = !!visualDone[t.id];
+
+                if (done && !vDone) {
+                    if (!timersRef.current[t.id]) {
+                        timersRef.current[t.id] = setTimeout(() => {
+                            setVisualDone(prev => ({ ...prev, [t.id]: true }));
+                            delete timersRef.current[t.id];
+                        }, 1200); // 1.2 second delay before moving down
+                    }
+                } else if (!done && vDone) {
+                    if (timersRef.current[t.id]) {
+                        clearTimeout(timersRef.current[t.id]);
+                        delete timersRef.current[t.id];
+                    }
+                    nextVisualDone[t.id] = false;
+                    needsInstantUpdate = true;
+                }
+            });
+        }
+
+        if (needsInstantUpdate) setVisualDone(nextVisualDone);
+    }, [state.tasks, state.currentUser]);
+
     const totalTasks = state.tasks.length;
     const urgentTasks = state.tasks.filter(t => {
         const dl = getDeadlineInfo(t.deadline);
@@ -190,8 +233,8 @@ const Dashboard: React.FC = () => {
     const doneTasks = state.tasks.filter(t => isAllDone(t, state.currentUser)).length;
 
     const sortedTasks = [...state.tasks].sort((a, b) => {
-        const ad = isAllDone(a, state.currentUser);
-        const bd = isAllDone(b, state.currentUser);
+        const ad = !!visualDone[a.id];
+        const bd = !!visualDone[b.id];
         if (ad !== bd) return ad ? 1 : -1;
         return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
     });
